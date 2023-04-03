@@ -25,9 +25,12 @@ pub fn map_collision(
         Ok(ts) => ts,
         _ => return,
     };
+    let grid_size: Vec2 = grid_size.into();
+    let grid_size = grid_size * tilemap_transform.scale.xy();
+    let tilemap_translation = tilemap_transform.translation.xy() - grid_size / 2.;
 
     for (mut movement, transform, body) in body_query.iter_mut() {
-        let mut relative_translation = transform.translation.xy() - tilemap_transform.translation.xy();
+        let mut relative_translation: Vec2 = transform.translation.xy() - tilemap_translation;
         let this_frame = movement.next_pos - transform.translation.xy();
 
         // check horizontal movement first so the player has an easier time landing on platforms
@@ -38,11 +41,11 @@ pub fn map_collision(
                 y: 0.,
             };
             let position_to_check = relative_translation + movement_this_step;
-            if is_body_in_map_tile(tile_storage, grid_size, position_to_check, body) {
+            if is_body_in_map_tile(tile_storage, &grid_size.into(), position_to_check, body) {
                 if this_frame.x > 0. {
-                    movement.next_pos.x = position_to_check.x.ceil() - 1. + tilemap_transform.translation.x;
+                    movement.next_pos.x = position_to_check.x.ceil() - 1. + tilemap_translation.x;
                 } else {
-                    movement.next_pos.x = position_to_check.x.floor() + 1. + tilemap_transform.translation.x;
+                    movement.next_pos.x = position_to_check.x.floor() + 1. + tilemap_translation.x;
                 }
                 movement.speed.x = 0.;
                 break;
@@ -53,7 +56,7 @@ pub fn map_collision(
         movement.grounded = false;
 
         // don't get stuck in corners
-        relative_translation.x = movement.next_pos.x - tilemap_transform.translation.x;
+        relative_translation.x = movement.next_pos.x - tilemap_translation.x;
 
         // vertical movement
         let steps = this_frame.y.abs().ceil();
@@ -63,11 +66,11 @@ pub fn map_collision(
                 y: y as f32 / steps * this_frame.y,
             };
             let position_to_check = relative_translation + movement_this_step;
-            if is_body_in_map_tile(tile_storage, grid_size, position_to_check, body) {
+            if is_body_in_map_tile(tile_storage, &grid_size.into(), position_to_check, body) {
                 if this_frame.y > 0. {
-                    movement.next_pos.y = position_to_check.y.ceil() - 1. + tilemap_transform.translation.y;
+                    movement.next_pos.y = position_to_check.y.ceil() - 1. + tilemap_translation.y;
                 } else {
-                    movement.next_pos.y = position_to_check.y.floor() + 1. + tilemap_transform.translation.y;
+                    movement.next_pos.y = position_to_check.y.floor() + 1. + tilemap_translation.y;
                     movement.grounded = true;
                 }
                 movement.speed.y = 0.;

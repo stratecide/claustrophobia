@@ -35,7 +35,9 @@ pub fn startup(
     let grid_size = tile_size.into();
     let map_type = TilemapType::default();
 
-    println!("tilemap pos: {:?}", get_tilemap_center_transform(&map_size, &grid_size, &map_type, 0.));
+    let mut transform = get_tilemap_center_transform(&map_size, &grid_size, &map_type, 0.);
+    transform.scale.x = 0.75;
+
     commands.entity(tilemap_entity).insert(TilemapBundle {
         grid_size,
         map_type,
@@ -43,7 +45,7 @@ pub fn startup(
         storage: tile_storage,
         texture: TilemapTexture::Single(texture_handle),
         tile_size,
-        transform: get_tilemap_center_transform(&map_size, &grid_size, &map_type, 0.),
+        transform,
         //transform: Transform::from_xyz(0., 0., 0.),
         ..Default::default()
     });

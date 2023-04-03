@@ -15,10 +15,8 @@ pub struct CollisionBody(pub Rect);
 impl Default for CollisionBody {
     fn default() -> Self {
         Self(Rect {
-            //min: Vec2::from_array([-8., -8.]),
-            //max: Vec2::from_array([8., 8.]),
-            min: Vec2::from_array([0., 0.]),
-            max: Vec2::from_array([16., 16.]),
+            min: Vec2::from_array([-8., -8.]),
+            max: Vec2::from_array([8., 8.]),
         })
     }
 }
