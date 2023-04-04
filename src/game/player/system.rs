@@ -1,13 +1,18 @@
 use bevy::prelude::*;
 
-use crate::game::physics::component::{GravityBody, Movement, DefaultCollider};
+use crate::game::physics::component::*;
+use crate::level_loader::Level;
+use crate::resource::LevelHandle;
 
 use super::component::*;
 
 pub fn spawn_player(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    level_handle: Res<LevelHandle>,
+    level_assets: Res<Assets<Level>>,
 ) {
+    let level_data = level_assets.get(&level_handle.handle).unwrap();
 
     commands.spawn((
         Player,
@@ -16,12 +21,12 @@ pub fn spawn_player(
         DefaultCollider::default(),
         SpriteBundle {
             texture: asset_server.load("player.png"),
-            transform: Transform::from_xyz(-80., -80., 0.),
+            transform: Transform::from_xyz(level_data.player_pos.x, level_data.size.y as f32 * 16. - 16. - level_data.player_pos.y, 0.),
             ..Default::default()
         },
     ));
 
-    println!("spawned player");
+    println!("spawned player at {}, {}", level_data.player_pos.x, level_data.size.y as f32 * 16. - 16. - level_data.player_pos.y);
 }
 
 pub fn player_input(
@@ -42,7 +47,7 @@ pub fn player_input(
 
     for mut player in player_query.iter_mut() {
         player.speed.x *= 0.0005_f32.powf(delta_seconds);
-        player.speed.x += horizontal * 2000. * delta_seconds;
+        player.speed.x += horizontal * 1500. * delta_seconds;
         if horizontal == 0. && player.speed.x.abs() < 100. * delta_seconds {
             player.speed.x = 0.;
         }

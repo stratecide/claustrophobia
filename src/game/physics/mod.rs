@@ -12,7 +12,7 @@ use system::*;
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 pub enum PhysicsSystemSet {
     SetMovementThisFrame,
-    BeforeMovement,
+    Collisions,
     Movement,
     AfterMovement,
 }
@@ -26,7 +26,7 @@ impl Plugin for PhysicsPlugin {
 
             .configure_sets((
                     PhysicsSystemSet::SetMovementThisFrame,
-                    PhysicsSystemSet::BeforeMovement,
+                    PhysicsSystemSet::Collisions,
                     PhysicsSystemSet::Movement,
                     PhysicsSystemSet::AfterMovement,
                 ).chain())
@@ -34,7 +34,7 @@ impl Plugin for PhysicsPlugin {
             .add_system(set_speed_this_frame.in_set(PhysicsSystemSet::SetMovementThisFrame))
 
             // after input is handled, check whether speeds have to be adjusted
-            .add_system(map_collision.in_set(PhysicsSystemSet::BeforeMovement))
+            .add_system(map_collision.in_set(PhysicsSystemSet::Collisions))
 
             // now movement can happen without problems (I hope)
             .add_system(movement_step.in_set(PhysicsSystemSet::Movement))

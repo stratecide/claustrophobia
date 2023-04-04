@@ -84,6 +84,10 @@ pub fn movement_step(
     mut body_query: Query<(&mut Transform, &Movement)>,
 ) {
     for (mut transform, movement) in body_query.iter_mut() {
+        if movement.next_pos.length() == 0. {
+            // TODO: fix this properly
+            continue;
+        }
         transform.translation = movement.next_pos.extend(0.);
     }
 }

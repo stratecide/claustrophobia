@@ -1,33 +1,51 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
-pub fn startup(
+use crate::resource::LevelHandle;
+use crate::level_loader::Level;
+
+pub fn build_level(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    //array_texture_loader: Res<ArrayTextureLoader>,
+    level_handle: Res<LevelHandle>,
+    level_assets: Res<Assets<Level>>,
 ) {
+    let level_data = level_assets.get(&level_handle.handle).unwrap();
+
     let texture_handle: Handle<Image> = asset_server.load("tiles.png");
-    let map_size = TilemapSize { x: 32, y: 32 };
+    let map_size = level_data.size;
     let tilemap_entity = commands.spawn_empty().id();
 
     let mut tile_storage = TileStorage::empty(map_size);
 
     for x in 0..map_size.x {
         for y in 0..map_size.y {
-            if x.min(y) > 5 && x.max(y) < 12 {
-                continue;
+            if let Some(_tile) = level_data.tiles.get(&[x, y]) {
+                let mut texture_index = TileTextureIndex(0);
+                if x == map_size.x - 1 || level_data.tiles.get(&[x + 1, y]).is_some() {
+                    texture_index.0 += 1;
+                }
+                // above
+                if y == 0 || level_data.tiles.get(&[x, y - 1]).is_some() {
+                    texture_index.0 += 2;
+                }
+                // left
+                if x == 0 || level_data.tiles.get(&[x - 1, y]).is_some() {
+                    texture_index.0 += 4;
+                }
+                // below
+                if y == map_size.y - 1 || level_data.tiles.get(&[x, y + 1]).is_some() {
+                    texture_index.0 += 8;
+                }
+                let position = TilePos { x, y: map_size.y - 1 - y };
+                let tile_entity = commands.spawn(TileBundle {
+                    position,
+                    texture_index,
+                    tilemap_id: TilemapId(tilemap_entity),
+                    ..Default::default()
+                }).id();
+                tile_storage.set(&position, tile_entity);
             }
-            if x.min(y) > 8 && x.max(y) < 16 {
-                continue;
-            }
-            let position = TilePos { x, y };
-            let tile_entity = commands.spawn(TileBundle {
-                position,
-                texture_index: TileTextureIndex (0),
-                tilemap_id: TilemapId(tilemap_entity),
-                ..Default::default()
-            }).id();
-            tile_storage.set(&position, tile_entity);
         }
     }
 
@@ -35,8 +53,8 @@ pub fn startup(
     let grid_size = tile_size.into();
     let map_type = TilemapType::default();
 
-    let mut transform = get_tilemap_center_transform(&map_size, &grid_size, &map_type, 0.);
-    transform.scale.x = 0.75;
+    //let transform = get_tilemap_center_transform(&map_size, &grid_size, &map_type, 0.);
+    //transform.scale.x = 0.5;
 
     commands.entity(tilemap_entity).insert(TilemapBundle {
         grid_size,
@@ -45,13 +63,15 @@ pub fn startup(
         storage: tile_storage,
         texture: TilemapTexture::Single(texture_handle),
         tile_size,
-        transform,
-        //transform: Transform::from_xyz(0., 0., 0.),
+        //transform,
+        transform: Transform::from_xyz(0., 0., 0.),
         ..Default::default()
     });
 
     println!("tilemap set up");
+
 }
+
 
 pub fn fix_tilemap_edges(
     mut tile_query: Query<(&mut TileTextureIndex, &TilePos)>,
