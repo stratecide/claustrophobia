@@ -11,6 +11,7 @@ impl Plugin for MapPlugin {
         app
             .add_system(build_level.in_schedule(OnEnter(Screen::Level)))
             .add_system(fix_tilemap_edges.in_schedule(OnEnter(Screen::Level)).after(build_level))
+            .add_system(squish_map)
             ;
     }
 }

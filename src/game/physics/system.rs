@@ -2,6 +2,8 @@ use bevy::prelude::*;
 use bevy::math::Vec3Swizzles;
 use bevy_ecs_tilemap::prelude::*;
 
+use crate::game::medicine::resource::SideEffects;
+
 use super::component::*;
 use super::resource::*;
 use super::is_body_in_map_tile;
@@ -9,11 +11,18 @@ use super::is_body_in_map_tile;
 pub fn set_speed_this_frame(
     mut movement_query: Query<(&mut Movement, &Transform)>,
     time: Res<Time>,
+    side_effects: Res<SideEffects>,
 ) {
     let delta_seconds = time.delta_seconds();
 
+    let paused = side_effects.is_active();
+
     for (mut movement, transform) in movement_query.iter_mut() {
-        movement.next_pos = transform.translation.xy() + movement.speed * delta_seconds;
+        movement.next_pos = transform.translation.xy();
+        if !paused {
+            let next_pos = movement.next_pos;
+            movement.next_pos = next_pos + movement.speed * delta_seconds;
+        }
     }
 }
 
@@ -96,7 +105,11 @@ pub fn apply_gravity(
     mut movement_query: Query<&mut Movement, With<GravityBody>>,
     time: Res<Time>,
     gravity: Res<Gravity>,
+    side_effects: Res<SideEffects>,
 ) {
+    if side_effects.is_active() {
+        return;
+    }
     let speed_change = gravity.0 * time.delta_seconds();
     for mut movement in movement_query.iter_mut() {
         movement.speed += speed_change;

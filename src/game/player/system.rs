@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+use crate::game::medicine::resource::SideEffects;
 use crate::game::physics::component::*;
 use crate::level_loader::Level;
 use crate::resource::LevelHandle;
@@ -33,6 +34,7 @@ pub fn player_input(
     mut player_query: Query<&mut Movement, With<Player>>,
     keyboard: Res<Input<KeyCode>>,
     time: Res<Time>,
+    side_effects: Res<SideEffects>,
 ) {
     let mut horizontal = 0.;
     let pressed_jump = keyboard.just_pressed(KeyCode::Up) || keyboard.just_pressed(KeyCode::W);
@@ -44,15 +46,20 @@ pub fn player_input(
     }
 
     let delta_seconds = time.delta_seconds();
+    let (hspeed, jump_strength) = if side_effects.sedated {
+        (1000., 400.)
+    } else {
+        (1500., 500.)
+    };
 
     for mut player in player_query.iter_mut() {
         player.speed.x *= 0.0005_f32.powf(delta_seconds);
-        player.speed.x += horizontal * 1500. * delta_seconds;
-        if horizontal == 0. && player.speed.x.abs() < 100. * delta_seconds {
+        player.speed.x += horizontal * hspeed * delta_seconds;
+        if horizontal == 0. && player.speed.x.abs() < 2. {
             player.speed.x = 0.;
         }
         if pressed_jump && player.grounded {
-            player.speed.y = 500.;
+            player.speed.y = jump_strength;
         }
     }
 }

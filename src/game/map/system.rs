@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
+use crate::game::medicine::resource::SideEffects;
 use crate::resource::LevelHandle;
 use crate::level_loader::Level;
 
@@ -103,5 +104,14 @@ pub fn fix_tilemap_edges(
         }
     }
     println!("fixed tilemap edges");
+}
+
+pub fn squish_map(
+    mut map_query: Query<&mut Transform, With<TileStorage>>,
+    side_effects: Res<SideEffects>,
+) {
+    for mut transform in map_query.iter_mut() {
+        transform.scale.x = side_effects.total_squish_factor() / 2.;
+    }
 }
 
