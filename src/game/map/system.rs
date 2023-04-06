@@ -111,7 +111,7 @@ pub fn squish_map(
     side_effects: Res<SideEffects>,
 ) {
     for mut transform in map_query.iter_mut() {
-        transform.scale.x = side_effects.total_squish_factor() / 2.;
+        transform.scale.x = side_effects.total_squish_factor();
     }
 }
 

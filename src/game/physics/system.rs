@@ -6,7 +6,7 @@ use crate::game::medicine::resource::SideEffects;
 
 use super::component::*;
 use super::resource::*;
-use super::is_body_in_map_tile;
+use super::*;
 
 pub fn set_speed_this_frame(
     mut movement_query: Query<(&mut Movement, &Transform)>,
@@ -22,6 +22,7 @@ pub fn set_speed_this_frame(
         if !paused {
             let next_pos = movement.next_pos;
             movement.next_pos = next_pos + movement.speed * delta_seconds;
+            movement.grounded = false;
         }
     }
 }
@@ -61,9 +62,6 @@ pub fn map_collision(
             }
         }
 
-        // reset grounded
-        movement.grounded = false;
-
         // don't get stuck in corners
         relative_translation.x = movement.next_pos.x - tilemap_translation.x;
 
@@ -89,6 +87,54 @@ pub fn map_collision(
     }
 }
 
+pub fn static_body_collision(
+    mut body_query: Query<(&mut Movement, &Transform, &CollisionBody), With<MapCollider>>,
+    static_body_query: Query<(&Transform, &CollisionBody), Without<Movement>>,
+) {
+    for (mut movement, transform, body) in body_query.iter_mut() {
+        for (static_transform, static_body) in &static_body_query {
+            let this_frame = movement.next_pos - transform.translation.xy();
+
+            // check horizontal movement first so the player has an easier time landing on platforms
+            let steps = this_frame.x.abs().ceil();
+            for x in 1..steps as u32 + 1 {
+                let movement_this_step = Vec2 {
+                    x: x as f32 / steps * this_frame.x,
+                    y: 0.,
+                };
+                if are_bodies_colliding(transform.translation.xy() + movement_this_step, body, static_transform.translation.xy(), static_body) {
+                    if this_frame.x > 0. {
+                        movement.next_pos.x = static_transform.translation.x + static_body.0.min.x - body.0.max.x;
+                    } else {
+                        movement.next_pos.x = static_transform.translation.x + static_body.0.max.x - body.0.min.x;
+                    }
+                    movement.speed.x = 0.;
+                    break;
+                }
+            }
+
+            // vertical movement
+            let steps = this_frame.y.abs().ceil();
+            for y in 1..steps as u32 + 1 {
+                let movement_this_step = Vec2 {
+                    x: movement.next_pos.x - transform.translation.x,
+                    y: y as f32 / steps * this_frame.y,
+                };
+                if are_bodies_colliding(transform.translation.xy() + movement_this_step, body, static_transform.translation.xy(), static_body) {
+                    if this_frame.y > 0. {
+                        movement.next_pos.y = static_transform.translation.y + static_body.0.min.y - body.0.max.y;
+                    } else {
+                        movement.next_pos.y = static_transform.translation.y + static_body.0.max.y - body.0.min.y;
+                        movement.grounded = true;
+                    }
+                    movement.speed.y = 0.;
+                    break;
+                }
+            }
+        }
+    }
+}
+
 pub fn movement_step(
     mut body_query: Query<(&mut Transform, &Movement)>,
 ) {
@@ -97,7 +143,7 @@ pub fn movement_step(
             // TODO: fix this properly
             continue;
         }
-        transform.translation = movement.next_pos.extend(0.);
+        transform.translation = movement.next_pos.extend(transform.translation.z);
     }
 }
 

@@ -34,7 +34,11 @@ impl Plugin for PhysicsPlugin {
             .add_system(set_speed_this_frame.in_set(PhysicsSystemSet::SetMovementThisFrame))
 
             // after input is handled, check whether speeds have to be adjusted
-            .add_system(map_collision.in_set(PhysicsSystemSet::Collisions))
+            .add_systems((
+                    map_collision,
+                    static_body_collision,
+                ).in_set(PhysicsSystemSet::Collisions)
+            )
 
             // now movement can happen without problems (I hope)
             .add_system(movement_step.in_set(PhysicsSystemSet::Movement))
@@ -61,6 +65,13 @@ pub fn is_body_in_map_tile(tile_storage: &TileStorage, grid_size: &TilemapGridSi
         }
     }
     false
+}
+
+pub fn are_bodies_colliding(transform1: Vec2, body1: &CollisionBody, transform2: Vec2, body2: &CollisionBody) -> bool {
+    transform1.x + body1.0.min.x < transform2.x + body2.0.max.x &&
+    transform1.x + body1.0.max.x > transform2.x + body2.0.min.x &&
+    transform1.y + body1.0.min.y < transform2.y + body2.0.max.y &&
+    transform1.y + body1.0.max.y > transform2.y + body2.0.min.y
 }
 
 /*fn is_point_in_map_tile(tile_storage: &TileStorage, grid_size: &TilemapGridSize, position: Vec2) -> bool {

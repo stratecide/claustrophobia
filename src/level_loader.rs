@@ -15,6 +15,7 @@ pub struct Level {
     pub tiles: HashMap<[u32; 2], u8>,
     pub player_pos: Vec2,
     pub pills: Vec<Vec2>,
+    pub couches: Vec<Vec2>,
 }
 
 #[derive(Debug, TypeUuid)]
@@ -57,6 +58,7 @@ impl AssetLoader for LevelLoader {
                     tiles: HashMap::new(),
                     player_pos: Vec2::new(0., 0.),
                     pills: vec![],
+                    couches: vec![],
                 };
                 for json_layer in json_level.get("layerInstances").unwrap().as_array().unwrap() {
                     let grid_size = json_layer.get("__gridSize").unwrap().as_u64().unwrap() as u32;
@@ -77,6 +79,7 @@ impl AssetLoader for LevelLoader {
                         match json_entity.get("__identifier").unwrap().as_str().unwrap() {
                             "Player" => level.player_pos = Vec2::new(x, y),
                             "Pill" => level.pills.push(Vec2::new(x, y)),
+                            "Couch" => level.couches.push(Vec2::new(x + 8., y)),
                             _ => (),
                         }
                     }

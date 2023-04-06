@@ -1,11 +1,13 @@
+use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 
+use crate::game::physics::are_bodies_colliding;
 use crate::game::physics::component::CollisionBody;
 use crate::game::player::component::*;
 use crate::level_loader::Level;
 use crate::resource::LevelHandle;
 
-use super::component::Medicine;
+use super::component::*;
 use super::resource::*;
 
 pub fn init_side_effects(
@@ -19,6 +21,7 @@ pub fn spawn_medicine(
     asset_server: Res<AssetServer>,
     level_handle: Res<LevelHandle>,
     level_assets: Res<Assets<Level>>,
+    side_effects: Res<SideEffects>,
 ) {
     let level_data = level_assets.get(&level_handle.handle).unwrap();
 
@@ -27,14 +30,36 @@ pub fn spawn_medicine(
             Medicine,
             SpriteBundle {
                 texture: asset_server.load("pill.png"),
-                transform: Transform::from_xyz(pill_pos.x, level_data.size.y as f32 * 16. - 16. - pill_pos.y, 0.),
+                transform: Transform::from_xyz(pill_pos.x * side_effects.total_squish_factor(), level_data.size.y as f32 * 16. - 16. - pill_pos.y, 0.),
                 ..Default::default()
             },
         ));
-        println!("spawned pill at {}, {}", pill_pos.x, level_data.size.y as f32 * 16. - 16. - pill_pos.y);
     }
+}
 
-    println!("spawned {} pills", level_data.pills.len());
+pub fn spawn_couch(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    level_handle: Res<LevelHandle>,
+    level_assets: Res<Assets<Level>>,
+    side_effects: Res<SideEffects>,
+) {
+    let level_data = level_assets.get(&level_handle.handle).unwrap();
+
+    for couch_pos in &level_data.couches {
+        commands.spawn((
+            Couch,
+            CollisionBody(Rect {
+                min: Vec2::new(-16., -8.),
+                max: Vec2::new(16., 0.),
+            }),
+            SpriteBundle {
+                texture: asset_server.load("couch.png"),
+                transform: Transform::from_xyz(couch_pos.x * side_effects.total_squish_factor(), level_data.size.y as f32 * 16. - 16. - couch_pos.y, 2.),
+                ..Default::default()
+            },
+        ));
+    }
 }
 
 pub fn collect_medicine(
@@ -66,6 +91,28 @@ pub fn tick_side_effects(
     if side_effects.squish_factor() != 1. {
         for mut transform in transform_query.iter_mut() {
             transform.translation.x *= side_effects.squish_factor();
+        }
+    }
+}
+
+pub fn rest_on_couch(
+    mut side_effects: ResMut<SideEffects>,
+    player_query: Query<(&Transform, &CollisionBody), With<Player>>,
+    couch_query: Query<(&Transform, &CollisionBody), With<Couch>>,
+) {
+    if side_effects.total_squish_factor() != 0.5 {
+        for (player_transform, player_body) in &player_query {
+            let mut below_player = player_transform.translation.xy();
+            below_player.y -= 1.;
+            for (couch_transform, couch_body) in &couch_query {
+                if are_bodies_colliding(below_player, player_body, couch_transform.translation.xy(), couch_body)
+                    && player_body.0.min.x + below_player.x >= couch_body.0.min.x + couch_transform.translation.x
+                    && player_body.0.max.x + below_player.x <= couch_body.0.max.x + couch_transform.translation.x {
+
+                    side_effects.sedated = false;
+                    side_effects.start_squish_timer(SquishDirection::Shrink);
+                }
+            }
         }
     }
 }

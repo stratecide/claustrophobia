@@ -17,7 +17,8 @@ pub struct SideEffects {
 }
 impl SideEffects {
     pub fn new() -> Self {
-        let squish_timer = Timer::from_seconds(2., TimerMode::Once);
+        let mut squish_timer = Timer::from_seconds(2., TimerMode::Once);
+        squish_timer.set_elapsed(Duration::from_secs(2));
         Self {
             direction: SquishDirection::Shrink,
             squish_factor: 1.,
@@ -26,7 +27,7 @@ impl SideEffects {
         }
     }
     pub fn total_squish_factor(&self) -> f32 {
-        match self.direction {
+        0.5 * match self.direction {
             SquishDirection::Expand => self.squish_timer.percent() + 1.,
             SquishDirection::Shrink => self.squish_timer.percent_left() + 1.,
         }

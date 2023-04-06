@@ -12,6 +12,7 @@ pub fn spawn_player(
     asset_server: Res<AssetServer>,
     level_handle: Res<LevelHandle>,
     level_assets: Res<Assets<Level>>,
+    side_effects: Res<SideEffects>,
 ) {
     let level_data = level_assets.get(&level_handle.handle).unwrap();
 
@@ -22,7 +23,7 @@ pub fn spawn_player(
         DefaultCollider::default(),
         SpriteBundle {
             texture: asset_server.load("player.png"),
-            transform: Transform::from_xyz(level_data.player_pos.x, level_data.size.y as f32 * 16. - 16. - level_data.player_pos.y, 0.),
+            transform: Transform::from_xyz(level_data.player_pos.x * side_effects.total_squish_factor(), level_data.size.y as f32 * 16. - 16. - level_data.player_pos.y, 100.),
             ..Default::default()
         },
     ));

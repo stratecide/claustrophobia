@@ -11,7 +11,7 @@
 	"iid": "9bf0cc30-c640-11ed-8b5f-514ec1ad22c2",
 	"jsonVersion": "1.2.5",
 	"appBuildId": 466817,
-	"nextUid": 8,
+	"nextUid": 10,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "LinearHorizontal",
@@ -152,6 +152,35 @@
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "Couch",
+			"uid": 9,
+			"tags": [],
+			"exportToToc": false,
+			"doc": null,
+			"width": 32,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#EAD4AA",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 8,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 8, "x": 0, "y": 0, "w": 32, "h": 16 },
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -213,6 +242,25 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "0", "averageColors": "59ab" }
+		},
+		{
+			"__cWid": 2,
+			"__cHei": 1,
+			"identifier": "Couch",
+			"uid": 8,
+			"relPath": "../couch.png",
+			"embedAtlas": null,
+			"pxWid": 32,
+			"pxHei": 16,
+			"tileGridSize": 16,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "00", "averageColors": "c472c472" }
 		}
 	], "enums": [], "externalEnums": [], "levelFields": [] },
 	"levels": [
@@ -287,6 +335,20 @@
 							"height": 16,
 							"defUid": 7,
 							"px": [80,64],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Couch",
+							"__grid": [5,12],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 8, "x": 0, "y": 0, "w": 32, "h": 16 },
+							"__smartColor": "#EAD4AA",
+							"iid": "9f94dd60-c640-11ed-af9c-1d831e8c9ad3",
+							"width": 32,
+							"height": 16,
+							"defUid": 9,
+							"px": [80,192],
 							"fieldInstances": []
 						}
 					]
