@@ -35,8 +35,7 @@ impl Plugin for PhysicsPlugin {
 
             // after input is handled, check whether speeds have to be adjusted
             .add_systems((
-                    map_collision,
-                    static_body_collision,
+                    handle_collisions,
                 ).in_set(PhysicsSystemSet::Collisions)
             )
 
