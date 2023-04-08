@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::game::medicine::resource::SideEffects;
 use crate::game::physics::component::*;
+use crate::game::player::component::Player;
 use crate::resource::LevelHandle;
 use crate::level_loader::Level;
 
@@ -24,6 +25,10 @@ pub fn spawn_enemy(
                 speed: Vec2::new(PATROL_SPEED_NORMAL, 0.),
                 ..Default::default()
             },
+            HitBox(Rect {
+                min: Vec2::new(-9., -16.),
+                max: Vec2::new(9., 1.),
+            }),
             DefaultCollider {
                 body: CollisionBody(Rect {
                     min: Vec2::new(-8., -16.),
@@ -32,7 +37,7 @@ pub fn spawn_enemy(
                 ..Default::default()
             },
             SemiSolid {
-                top_left: Vec2::new(-8., 8.),
+                top_left: Vec2::new(-8., 0.),
                 width: 16.,
             },
             SpriteBundle {
@@ -45,7 +50,8 @@ pub fn spawn_enemy(
 }
 
 pub fn control_enemy(
-    mut patrol_list: Query<(&mut Movement, &mut Transform, &mut Handle<Image>), With<Patrol>>,
+    mut commands: Commands,
+    mut patrol_list: Query<(Entity, &mut Movement, &mut Transform, &mut Handle<Image>), With<Patrol>>,
     side_effects: Res<SideEffects>,
     asset_server: Res<AssetServer>,
 ) {
@@ -54,13 +60,42 @@ pub fn control_enemy(
     } else {
         (PATROL_SPEED_NORMAL, asset_server.load("enemy/patrol_angry.png"))
     };
-    for (mut movement, mut transform, mut image) in patrol_list.iter_mut() {
+    for (entity, mut movement, mut transform, mut image) in patrol_list.iter_mut() {
         if movement.speed.x == 0. {
             transform.scale.x *= -1.;
         }
         movement.speed.x = patrol_speed * transform.scale.x;
-        if !side_effects.is_active() {
+        if !side_effects.is_active() && *image != texture {
             *image = texture.clone();
+            if let Some(mut entity_commands) = commands.get_entity(entity) {
+                if side_effects.sedated {
+                    entity_commands.remove::<HitBox>();
+                } else {
+                    entity_commands.insert(HitBox(Rect {
+                        min: Vec2::new(-9., -16.),
+                        max: Vec2::new(9., 1.),
+                    }));
+                }
+            }
+        }
+    }
+}
+
+pub fn enemy_kills_player(
+    mut commands: Commands,
+    hitbox_query: Query<(&Transform, &HitBox)>,
+    player_query: Query<(Entity, &Transform, &CollisionBody), With<Player>>,
+) {
+    for (player_entity, player_transform, player) in &player_query {
+        for (enemy_transform, hitbox) in &hitbox_query {
+            if player_transform.translation.x + player.0.min.x < enemy_transform.translation.x + hitbox.0.max.x
+            && player_transform.translation.x + player.0.max.x > enemy_transform.translation.x + hitbox.0.min.x
+            && player_transform.translation.y + player.0.min.y < enemy_transform.translation.y + hitbox.0.max.y
+            && player_transform.translation.y + player.0.max.y > enemy_transform.translation.y + hitbox.0.min.y {
+                if let Some(mut player_commands) = commands.get_entity(player_entity) {
+                    player_commands.despawn();
+                }
+            }
         }
     }
 }

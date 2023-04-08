@@ -31,6 +31,7 @@ pub fn handle_collisions(
     mut body_query: Query<(&mut Movement, &Transform, &CollisionBody), With<MapCollider>>,
     tile_storage_query: Query<(&TileStorage, &Transform, &TilemapGridSize)>,
     static_body_query: Query<(&Transform, &CollisionBody), Without<Movement>>,
+    semi_solid_query: Query<(&Transform, &SemiSolid)>,
 ) {
     let (tile_storage, tilemap_transform, grid_size) = match tile_storage_query.get_single() {
         Ok(ts) => ts,
@@ -71,7 +72,6 @@ pub fn handle_collisions(
                     }
                     movement.speed.x = 0.;
                     should_break = true;
-                    break;
                 }
             }
             if should_break {
@@ -110,7 +110,19 @@ pub fn handle_collisions(
                     }
                     movement.speed.y = 0.;
                     should_break = true;
-                    break;
+                }
+            }
+            if !should_break && this_frame.y < 0. {
+                for (ss_transform, semi_solid) in &semi_solid_query {
+                    if ss_transform.translation.x + semi_solid.top_left.x < movement.next_pos.x + body.0.max.x
+                    && ss_transform.translation.x + semi_solid.top_left.x + semi_solid.width > movement.next_pos.x + body.0.min.x
+                    && ss_transform.translation.y + semi_solid.top_left.y <= transform.translation.y + body.0.min.y
+                    && ss_transform.translation.y + semi_solid.top_left.y > movement.next_pos.y + body.0.min.y {
+                        movement.next_pos.y = ss_transform.translation.y + semi_solid.top_left.y - body.0.min.y;
+                        movement.grounded = true;
+                        movement.speed.y = 0.;
+                        should_break = true;
+                    }
                 }
             }
             if should_break {

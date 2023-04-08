@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 #[derive(Component, Default)]
-pub struct Enemy;
+pub struct HitBox(pub Rect);
 
 #[derive(Component, Default)]
 pub struct Patrol;

@@ -93,6 +93,11 @@ pub fn tick_side_effects(
     if side_effects.squish_factor() != 1. {
         for mut transform in transform_query.iter_mut() {
             transform.translation.x *= side_effects.squish_factor();
+            if !side_effects.is_active() {
+                // avoid floating-point issues
+                // i really should have scaled the camera instead of moving entities
+                transform.translation.x = transform.translation.x.round();
+            }
         }
     }
 }

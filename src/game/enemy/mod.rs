@@ -18,6 +18,7 @@ impl Plugin for EnemyPlugin {
         app
             .add_system(spawn_enemy.in_schedule(OnEnter(Screen::Level)))
             .add_system(control_enemy.before(PhysicsSystemSet::SetMovementThisFrame))
+            .add_system(enemy_kills_player)
             ;
     }
 }
