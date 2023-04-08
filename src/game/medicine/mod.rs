@@ -24,6 +24,7 @@ impl Plugin for MedicinePlugin {
             )
             .add_system(collect_medicine.in_set(PhysicsSystemSet::Collisions))
             .add_system(tick_side_effects)
+            .add_system(fix_squished_collision_bodies.after(tick_side_effects))
             .add_system(rest_on_couch)
             ;
     }

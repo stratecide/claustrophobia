@@ -21,6 +21,12 @@ impl Default for CollisionBody {
     }
 }
 
+#[derive(Component)]
+pub struct SemiSolid {
+    pub top_left: Vec2,
+    pub width: f32,
+}
+
 #[derive(Component, Default)]
 pub struct MapCollider;
 

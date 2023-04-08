@@ -11,7 +11,7 @@
 	"iid": "9bf0cc30-c640-11ed-8b5f-514ec1ad22c2",
 	"jsonVersion": "1.2.5",
 	"appBuildId": 466817,
-	"nextUid": 10,
+	"nextUid": 12,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "LinearHorizontal",
@@ -181,6 +181,35 @@
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "Patrol",
+			"uid": 11,
+			"tags": [],
+			"exportToToc": false,
+			"doc": null,
+			"width": 32,
+			"height": 32,
+			"resizableX": false,
+			"resizableY": false,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#E4A672",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 10,
+			"tileRenderMode": "FitInside",
+			"tileRect": { "tilesetUid": 10, "x": 0, "y": 0, "w": 32, "h": 32 },
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -261,6 +290,25 @@
 			"customData": [],
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "00", "averageColors": "c472c472" }
+		},
+		{
+			"__cWid": 2,
+			"__cHei": 2,
+			"identifier": "Patrol",
+			"uid": 10,
+			"relPath": "../enemy/patrol_angry.png",
+			"embedAtlas": null,
+			"pxWid": 32,
+			"pxHei": 32,
+			"tileGridSize": 16,
+			"spacing": 0,
+			"padding": 0,
+			"tags": [],
+			"tagsSourceEnumUid": null,
+			"enumTags": [],
+			"customData": [],
+			"savedSelections": [],
+			"cachedPixelData": { "opaqueTiles": "0000", "averageColors": "28222822ba52b942" }
 		}
 	], "enums": [], "externalEnums": [], "levelFields": [] },
 	"levels": [
@@ -349,6 +397,20 @@
 							"height": 16,
 							"defUid": 9,
 							"px": [80,192],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Patrol",
+							"__grid": [12,13],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 10, "x": 0, "y": 0, "w": 32, "h": 32 },
+							"__smartColor": "#E4A672",
+							"iid": "9093ab90-c640-11ed-90b8-9bd339d990ae",
+							"width": 32,
+							"height": 32,
+							"defUid": 11,
+							"px": [192,208],
 							"fieldInstances": []
 						}
 					]

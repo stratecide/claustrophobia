@@ -1,8 +1,8 @@
 pub mod camera;
-pub mod player;
 pub mod enemy;
 pub mod map;
 pub mod medicine;
+pub mod player;
 pub mod physics;
 
 mod system;
@@ -10,6 +10,7 @@ mod system;
 use bevy::prelude::*;
 
 use camera::*;
+use enemy::*;
 use map::*;
 use medicine::*;
 use player::*;
@@ -21,6 +22,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app
             .add_plugin(CameraPlugin)
+            .add_plugin(EnemyPlugin)
             .add_plugin(MapPlugin)
             .add_plugin(MedicinePlugin)
             .add_plugin(PlayerPlugin)

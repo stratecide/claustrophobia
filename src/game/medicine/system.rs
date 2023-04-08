@@ -1,8 +1,10 @@
-use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
+use bevy_ecs_tilemap::prelude::*;
+use bevy::math::Vec3Swizzles;
 
 use crate::game::physics::are_bodies_colliding;
-use crate::game::physics::component::CollisionBody;
+use crate::game::physics::component::*;
+use crate::game::physics::is_body_in_map_tile;
 use crate::game::player::component::*;
 use crate::level_loader::Level;
 use crate::resource::LevelHandle;
@@ -91,6 +93,43 @@ pub fn tick_side_effects(
     if side_effects.squish_factor() != 1. {
         for mut transform in transform_query.iter_mut() {
             transform.translation.x *= side_effects.squish_factor();
+        }
+    }
+}
+
+/**
+ * Checks if an entity got stuck in a wall due to squishing-effect and tries to free them
+ */
+pub fn fix_squished_collision_bodies(
+    side_effects: Res<SideEffects>,
+    mut collision_body_query: Query<(&mut Transform, &CollisionBody), With<Movement>>,
+    tile_storage_query: Query<(&TileStorage, &Transform, &TilemapGridSize), Without<Movement>>,
+) {
+    let (tile_storage, tilemap_transform, grid_size) = match tile_storage_query.get_single() {
+        Ok(ts) => ts,
+        _ => return,
+    };
+    let grid_size: Vec2 = grid_size.into();
+    let grid_size = grid_size * tilemap_transform.scale.xy();
+    let tilemap_pos = tilemap_transform.translation.xy() - grid_size / 2.;
+
+    if side_effects.squish_factor() != 1. || true {
+        for (mut transform, body) in collision_body_query.iter_mut() {
+            let mut pos = transform.translation.xy();
+            if is_body_in_map_tile(tile_storage, &grid_size.into(), pos - tilemap_pos, body) {
+                pos.x = pos.x.round();
+                let offset = Vec2::new(1., 0.);
+                for i in 1..17 {
+                    if !is_body_in_map_tile(tile_storage, &grid_size.into(), pos - tilemap_pos + offset * i as f32, body) {
+                        transform.translation.x = pos.x + i as f32;
+                        break;
+                    }
+                    if !is_body_in_map_tile(tile_storage, &grid_size.into(), pos - tilemap_pos + offset * -i as f32, body) {
+                        transform.translation.x = pos.x + -i as f32;
+                        break;
+                    }
+                }
+            }
         }
     }
 }
