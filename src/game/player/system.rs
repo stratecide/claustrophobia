@@ -19,6 +19,10 @@ pub fn spawn_player(
     commands.spawn((
         Player,
         GravityBody,
+        SemiSolid {
+            top_left: Vec2::new(-8., 8.),
+            width: 16.,
+        },
         Movement::default(),
         DefaultCollider::default(),
         SpriteBundle {

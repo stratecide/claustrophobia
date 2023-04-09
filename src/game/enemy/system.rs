@@ -19,7 +19,7 @@ pub fn spawn_enemy(
 
     for enemy_pos in &level_data.patrols {
         commands.spawn((
-            Patrol,
+            Patrol(false),
             GravityBody,
             Movement {
                 speed: Vec2::new(PATROL_SPEED_NORMAL, 0.),
@@ -51,7 +51,7 @@ pub fn spawn_enemy(
 
 pub fn control_enemy(
     mut commands: Commands,
-    mut patrol_list: Query<(Entity, &mut Movement, &mut Transform, &mut Handle<Image>), With<Patrol>>,
+    mut patrol_list: Query<(Entity, &mut Movement, &mut Transform, &mut Handle<Image>, &mut Patrol)>,
     side_effects: Res<SideEffects>,
     asset_server: Res<AssetServer>,
 ) {
@@ -60,7 +60,7 @@ pub fn control_enemy(
     } else {
         (PATROL_SPEED_NORMAL, asset_server.load("enemy/patrol_angry.png"))
     };
-    for (entity, mut movement, mut transform, mut image) in patrol_list.iter_mut() {
+    for (entity, mut movement, mut transform, mut image, mut patrol) in patrol_list.iter_mut() {
         if movement.speed.x == 0. {
             transform.scale.x *= -1.;
         }
@@ -78,6 +78,11 @@ pub fn control_enemy(
                 }
             }
         }
+        if !side_effects.is_active() && !side_effects.sedated && !movement.grounded && patrol.0 {
+            // went over an edge, jump
+            movement.speed.y = 300.;
+        }
+        patrol.0 = movement.grounded;
     }
 }
 

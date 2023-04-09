@@ -4,5 +4,5 @@ use bevy::prelude::*;
 pub struct HitBox(pub Rect);
 
 #[derive(Component, Default)]
-pub struct Patrol;
+pub struct Patrol(pub bool);
 
