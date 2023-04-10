@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct Medicine;
+pub enum Medicine {
+    Calm,
+    Cleanse,
+}
 
 #[derive(Component)]
 pub struct Couch;

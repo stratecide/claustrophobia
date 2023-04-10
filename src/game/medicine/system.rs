@@ -29,9 +29,19 @@ pub fn spawn_medicine(
 
     for pill_pos in &level_data.pills {
         commands.spawn((
-            Medicine,
+            Medicine::Calm,
             SpriteBundle {
                 texture: asset_server.load("pill.png"),
+                transform: Transform::from_xyz(pill_pos.x * side_effects.total_squish_factor(), level_data.size.y as f32 * 16. - 16. - pill_pos.y, 0.),
+                ..Default::default()
+            },
+        ));
+    }
+    for pill_pos in &level_data.pills2 {
+        commands.spawn((
+            Medicine::Cleanse,
+            SpriteBundle {
+                texture: asset_server.load("pill2.png"),
                 transform: Transform::from_xyz(pill_pos.x * side_effects.total_squish_factor(), level_data.size.y as f32 * 16. - 16. - pill_pos.y, 0.),
                 ..Default::default()
             },
@@ -71,14 +81,27 @@ pub fn collect_medicine(
     mut side_effects: ResMut<SideEffects>,
 ) {
     for (player_pos, player_body) in &player_query {
-        for (medicine_entity, _medicine_type, medicine_pos) in &medicine_query {
+        for (medicine_entity, medicine_type, medicine_pos) in &medicine_query {
             let relative_pos = medicine_pos.translation - player_pos.translation;
             if relative_pos.x >= player_body.0.min.x && relative_pos.x < player_body.0.max.x
-                && relative_pos.y >= player_body.0.min.y && relative_pos.y < player_body.0.max.y {
+            && relative_pos.y >= player_body.0.min.y && relative_pos.y < player_body.0.max.y {
                 // first get rid of the medicine
-                commands.entity(medicine_entity).despawn();
-                side_effects.sedated = true;
-                side_effects.start_squish_timer(SquishDirection::Expand);
+                match medicine_type {
+                    Medicine::Calm => {
+                        if !side_effects.sedated {
+                            commands.entity(medicine_entity).despawn();
+                            side_effects.sedated = true;
+                            side_effects.start_squish_timer(SquishDirection::Expand);
+                        }
+                    }
+                    Medicine::Cleanse => {
+                        if side_effects.sedated {
+                            commands.entity(medicine_entity).despawn();
+                            side_effects.sedated = false;
+                            side_effects.start_squish_timer(SquishDirection::Shrink);
+                        }
+                    }
+                }
             }
         }
     }

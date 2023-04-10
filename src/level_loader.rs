@@ -15,6 +15,7 @@ pub struct Level {
     pub tiles: HashMap<[u32; 2], u8>,
     pub player_pos: Vec2,
     pub pills: Vec<Vec2>,
+    pub pills2: Vec<Vec2>,
     pub couches: Vec<Vec2>,
     pub patrols: Vec<Vec2>,
     pub patrol_spawners: Vec<Vec2>,
@@ -61,6 +62,7 @@ impl AssetLoader for LevelLoader {
                     tiles: HashMap::new(),
                     player_pos: Vec2::new(0., 0.),
                     pills: vec![],
+                    pills2: vec![],
                     couches: vec![],
                     patrols: vec![],
                     patrol_spawners: vec![],
@@ -85,6 +87,7 @@ impl AssetLoader for LevelLoader {
                         match json_entity.get("__identifier").unwrap().as_str().unwrap() {
                             "Player" => level.player_pos = Vec2::new(x, y),
                             "Pill" => level.pills.push(Vec2::new(x, y)),
+                            "Pill2" => level.pills2.push(Vec2::new(x, y)),
                             "Couch" => level.couches.push(Vec2::new(x + 8., y)),
                             "Patrol" => level.patrols.push(Vec2::new(x + 8., y + 8.)),
                             "PatrolSpawner" => level.patrol_spawners.push(Vec2::new(x, y)),

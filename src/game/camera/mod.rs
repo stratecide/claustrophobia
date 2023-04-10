@@ -18,6 +18,7 @@ impl Plugin for CameraPlugin {
             .add_system(startup.in_schedule(OnEnter(Screen::Level)))
             .add_system(follow_player.in_set(PhysicsSystemSet::AfterMovement))
             .add_system(sides_follow_player.after(follow_player))
+            .add_system(set_window_size)
             ;
     }
 }

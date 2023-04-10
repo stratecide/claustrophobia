@@ -132,6 +132,7 @@ pub fn spawn_patrol(
     mut spawner_query: Query<(&mut PatrolSpawner, &Transform)>,
     patrol_query: Query<Entity, With<Patrol>>,
     asset_server: Res<AssetServer>,
+    side_effects: Res<SideEffects>,
 ) {
     let mut existing_patrols = HashSet::new();
     for patrol in &patrol_query {
@@ -139,7 +140,7 @@ pub fn spawn_patrol(
     }
     for (mut spawner, transform) in spawner_query.iter_mut() {
         if spawner.0.and_then(|e| Some(!existing_patrols.contains(&e))).unwrap_or(true) {
-            spawner.0 = Some(commands.spawn((
+            let mut cmd = commands.spawn((
                 Patrol(false),
                 GravityBody,
                 Movement {
@@ -166,7 +167,11 @@ pub fn spawn_patrol(
                     transform: Transform::from_xyz(transform.translation.x, transform.translation.y + 8., 0.),
                     ..Default::default()
                 },
-            )).id());
+            ));
+            if side_effects.sedated {
+                cmd.remove::<HitBox>();
+            }
+            spawner.0 = Some(cmd.id());
         }
     }
 }

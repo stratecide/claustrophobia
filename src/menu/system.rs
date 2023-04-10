@@ -24,6 +24,14 @@ pub fn transition_to_level(
             let level_list = level_list.get(&loading_state.level_list).unwrap();
             level_handle.handle = level_list.levels[2].1.clone();
             next_screen.set(Screen::Level);
+        } else if keyboard.just_pressed(KeyCode::Key4) {
+            let level_list = level_list.get(&loading_state.level_list).unwrap();
+            level_handle.handle = level_list.levels[3].1.clone();
+            next_screen.set(Screen::Level);
+        } else if keyboard.just_pressed(KeyCode::Key5) {
+            let level_list = level_list.get(&loading_state.level_list).unwrap();
+            level_handle.handle = level_list.levels[4].1.clone();
+            next_screen.set(Screen::Level);
         }
     }
 }
