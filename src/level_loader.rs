@@ -17,6 +17,8 @@ pub struct Level {
     pub pills: Vec<Vec2>,
     pub couches: Vec<Vec2>,
     pub patrols: Vec<Vec2>,
+    pub patrol_spawners: Vec<Vec2>,
+    pub patrol_despawners: Vec<Vec2>,
 }
 
 #[derive(Debug, TypeUuid)]
@@ -61,6 +63,8 @@ impl AssetLoader for LevelLoader {
                     pills: vec![],
                     couches: vec![],
                     patrols: vec![],
+                    patrol_spawners: vec![],
+                    patrol_despawners: vec![],
                 };
                 for json_layer in json_level.get("layerInstances").unwrap().as_array().unwrap() {
                     let grid_size = json_layer.get("__gridSize").unwrap().as_u64().unwrap() as u32;
@@ -83,6 +87,8 @@ impl AssetLoader for LevelLoader {
                             "Pill" => level.pills.push(Vec2::new(x, y)),
                             "Couch" => level.couches.push(Vec2::new(x + 8., y)),
                             "Patrol" => level.patrols.push(Vec2::new(x + 8., y + 8.)),
+                            "PatrolSpawner" => level.patrol_spawners.push(Vec2::new(x, y)),
+                            "PatrolDespawner" => level.patrol_despawners.push(Vec2::new(x, y)),
                             _ => (),
                         }
                     }
