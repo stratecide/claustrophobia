@@ -27,7 +27,7 @@ pub fn spawn_player(
         DefaultCollider::default(),
         SpriteBundle {
             texture: asset_server.load("player.png"),
-            transform: Transform::from_xyz(level_data.player_pos.x * side_effects.total_squish_factor(), level_data.size.y as f32 * 16. - 16. - level_data.player_pos.y, 100.),
+            transform: Transform::from_xyz(level_data.player_pos.x * side_effects.total_squish_factor(), level_data.size.y as f32 * 16. - 16. - level_data.player_pos.y, 10.),
             ..Default::default()
         },
     ));
