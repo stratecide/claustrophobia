@@ -60,5 +60,12 @@ impl SideEffects {
             self.squish_factor = 1.;
         }
     }
+    pub fn force_unsquish(&mut self) {
+        let progress_before = self.total_squish_factor();
+        self.direction = SquishDirection::Shrink; 
+        self.squish_timer.set_elapsed(Duration::from_secs(0));
+        self.squish_timer.pause();
+        self.squish_factor = self.total_squish_factor() / progress_before;
+    }
 }
 

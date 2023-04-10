@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 use bevy::math::Vec3Swizzles;
 
-use crate::game::physics::are_bodies_colliding;
+use crate::game::component::GameElement;
 use crate::game::physics::component::*;
 use crate::game::physics::is_body_in_map_tile;
 use crate::game::player::component::*;
@@ -29,6 +29,7 @@ pub fn spawn_medicine(
 
     for pill_pos in &level_data.pills {
         commands.spawn((
+            GameElement,
             Medicine::Calm,
             SpriteBundle {
                 texture: asset_server.load("pill.png"),
@@ -39,35 +40,11 @@ pub fn spawn_medicine(
     }
     for pill_pos in &level_data.pills2 {
         commands.spawn((
+            GameElement,
             Medicine::Cleanse,
             SpriteBundle {
                 texture: asset_server.load("pill2.png"),
                 transform: Transform::from_xyz(pill_pos.x * side_effects.total_squish_factor(), level_data.size.y as f32 * 16. - 16. - pill_pos.y, 0.),
-                ..Default::default()
-            },
-        ));
-    }
-}
-
-pub fn spawn_couch(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    level_handle: Res<LevelHandle>,
-    level_assets: Res<Assets<Level>>,
-    side_effects: Res<SideEffects>,
-) {
-    let level_data = level_assets.get(&level_handle.handle).unwrap();
-
-    for couch_pos in &level_data.couches {
-        commands.spawn((
-            Couch,
-            CollisionBody(Rect {
-                min: Vec2::new(-16., -8.),
-                max: Vec2::new(16., 0.),
-            }),
-            SpriteBundle {
-                texture: asset_server.load("couch.png"),
-                transform: Transform::from_xyz(couch_pos.x * side_effects.total_squish_factor(), level_data.size.y as f32 * 16. - 16. - couch_pos.y, 2.),
                 ..Default::default()
             },
         ));
@@ -156,28 +133,6 @@ pub fn fix_squished_collision_bodies(
                         transform.translation.x = pos.x + -i as f32;
                         break;
                     }
-                }
-            }
-        }
-    }
-}
-
-pub fn rest_on_couch(
-    mut side_effects: ResMut<SideEffects>,
-    player_query: Query<(&Transform, &CollisionBody), With<Player>>,
-    couch_query: Query<(&Transform, &CollisionBody), With<Couch>>,
-) {
-    if side_effects.total_squish_factor() != 0.5 {
-        for (player_transform, player_body) in &player_query {
-            let mut below_player = player_transform.translation.xy();
-            below_player.y -= 1.;
-            for (couch_transform, couch_body) in &couch_query {
-                if are_bodies_colliding(below_player, player_body, couch_transform.translation.xy(), couch_body)
-                    && player_body.0.min.x + below_player.x >= couch_body.0.min.x + couch_transform.translation.x
-                    && player_body.0.max.x + below_player.x <= couch_body.0.max.x + couch_transform.translation.x {
-
-                    side_effects.sedated = false;
-                    side_effects.start_squish_timer(SquishDirection::Shrink);
                 }
             }
         }

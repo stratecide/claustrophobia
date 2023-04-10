@@ -5,6 +5,7 @@ pub mod medicine;
 pub mod player;
 pub mod physics;
 
+pub mod component;
 mod system;
 
 use bevy::prelude::*;
@@ -15,6 +16,9 @@ use map::*;
 use medicine::*;
 use player::*;
 use physics::*;
+use system::*;
+
+use crate::resource::Screen;
 
 pub struct GamePlugin;
 
@@ -27,6 +31,7 @@ impl Plugin for GamePlugin {
             .add_plugin(MedicinePlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(PhysicsPlugin)
+            .add_system(next_level.in_set(OnUpdate(Screen::NextLevel)))
             ;
     }
 }

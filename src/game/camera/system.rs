@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy::sprite::*;
 use bevy::window::WindowResolution;
 
+use crate::game::component::GameElement;
 use crate::game::medicine::resource::SideEffects;
 use crate::game::player::component::Player;
 use crate::resource::LevelHandle;
@@ -29,28 +30,37 @@ pub fn startup(
     };
     camera.transform.scale.x = 0.5;
     camera.transform.scale.y = 0.5;
-    commands.spawn(camera);
+    commands.spawn((
+        GameElement,
+        camera,
+    ));
 
-    commands.spawn(MaterialMesh2dBundle {
-        mesh: Mesh2dHandle(meshes.add(Mesh::from(shape::Quad {
-            size: Vec2::new(window.width() / 8., window.height() / 2.),
-            flip: false,
-        }))),
-        transform: Transform::from_xyz(0., 0., 20.),
-        material: materials.add(ScarySidesMaterial {}),
-        ..default()
-    });
+    commands.spawn((
+        GameElement,
+        MaterialMesh2dBundle {
+            mesh: Mesh2dHandle(meshes.add(Mesh::from(shape::Quad {
+                size: Vec2::new(window.width() / 8., window.height() / 2.),
+                flip: false,
+            }))),
+            transform: Transform::from_xyz(0., 0., 20.),
+            material: materials.add(ScarySidesMaterial {}),
+            ..default()
+        }
+    ));
     let mut transform = Transform::from_xyz(0., 0., 20.);
     transform.scale.x = -1.;
-    commands.spawn(MaterialMesh2dBundle {
-        mesh: Mesh2dHandle(meshes.add(Mesh::from(shape::Quad {
-            size: Vec2::new(window.width() / 8., window.height() / 2.),
-            flip: false,
-        }))),
-        transform,
-        material: materials.add(ScarySidesMaterial {}),
-        ..default()
-    });
+    commands.spawn((
+        GameElement,
+        MaterialMesh2dBundle {
+            mesh: Mesh2dHandle(meshes.add(Mesh::from(shape::Quad {
+                size: Vec2::new(window.width() / 8., window.height() / 2.),
+                flip: false,
+            }))),
+            transform,
+            material: materials.add(ScarySidesMaterial {}),
+            ..default()
+        },
+    ));
 }
 
 pub fn follow_player(

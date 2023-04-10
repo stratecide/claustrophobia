@@ -12,27 +12,34 @@ pub fn transition_to_level(
     mut level_handle: ResMut<LevelHandle>,
 ) {
     if screen.0 == Screen::MainMenu {
+        let level_list = match level_list.get(&loading_state.level_list) {
+            Some(ll) => ll,
+            None => return,
+        };
+        /*let mut load_level = false;
         if keyboard.just_pressed(KeyCode::Key1) {
-            let level_list = level_list.get(&loading_state.level_list).unwrap();
-            level_handle.handle = level_list.levels[0].1.clone();
-            next_screen.set(Screen::Level);
+            level_handle.level_id = 0;
+            load_level = true;
         } else if keyboard.just_pressed(KeyCode::Key2) {
-            let level_list = level_list.get(&loading_state.level_list).unwrap();
-            level_handle.handle = level_list.levels[1].1.clone();
-            next_screen.set(Screen::Level);
+            level_handle.level_id = 1;
+            load_level = true;
         } else if keyboard.just_pressed(KeyCode::Key3) {
-            let level_list = level_list.get(&loading_state.level_list).unwrap();
-            level_handle.handle = level_list.levels[2].1.clone();
-            next_screen.set(Screen::Level);
+            level_handle.level_id = 2;
+            load_level = true;
         } else if keyboard.just_pressed(KeyCode::Key4) {
-            let level_list = level_list.get(&loading_state.level_list).unwrap();
-            level_handle.handle = level_list.levels[3].1.clone();
-            next_screen.set(Screen::Level);
+            level_handle.level_id = 3;
+            load_level = true;
         } else if keyboard.just_pressed(KeyCode::Key5) {
-            let level_list = level_list.get(&loading_state.level_list).unwrap();
-            level_handle.handle = level_list.levels[4].1.clone();
-            next_screen.set(Screen::Level);
+            level_handle.level_id = 4;
+            load_level = true;
         }
+        if load_level {
+            let level_list = level_list.get(&loading_state.level_list).unwrap();
+            level_handle.handle = level_list.levels[level_handle.level_id].1.clone();
+            next_screen.set(Screen::Level);
+        }*/
+        level_handle.handle = level_list.levels[level_handle.level_id].1.clone();
+        next_screen.set(Screen::NextLevel);
     }
 }
 

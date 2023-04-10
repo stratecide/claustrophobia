@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_ecs_tilemap::prelude::*;
 
+use crate::game::component::GameElement;
 use crate::game::medicine::resource::SideEffects;
 use crate::resource::LevelHandle;
 use crate::level_loader::Level;
@@ -39,12 +40,15 @@ pub fn build_level(
                     texture_index.0 += 8;
                 }
                 let position = TilePos { x, y: map_size.y - 1 - y };
-                let tile_entity = commands.spawn(TileBundle {
-                    position,
-                    texture_index,
-                    tilemap_id: TilemapId(tilemap_entity),
-                    ..Default::default()
-                }).id();
+                let tile_entity = commands.spawn((
+                    GameElement,
+                    TileBundle {
+                        position,
+                        texture_index,
+                        tilemap_id: TilemapId(tilemap_entity),
+                        ..Default::default()
+                    },
+                )).id();
                 tile_storage.set(&position, tile_entity);
             }
         }
@@ -57,6 +61,7 @@ pub fn build_level(
     //let transform = get_tilemap_center_transform(&map_size, &grid_size, &map_type, 0.);
     //transform.scale.x = 0.5;
 
+    commands.entity(tilemap_entity).insert(GameElement);
     commands.entity(tilemap_entity).insert(TilemapBundle {
         grid_size,
         map_type,

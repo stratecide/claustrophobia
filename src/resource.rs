@@ -9,7 +9,9 @@ pub struct LoadingState {
 
 #[derive(Default, Resource)]
 pub struct LevelHandle {
+    pub level_id: usize,
     pub handle: Handle<Level>,
+    pub waited: bool,
 }
 
 #[derive(States, Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -18,5 +20,6 @@ pub enum Screen {
     Loading,
     MainMenu,
     Level,
+    NextLevel,
 }
 

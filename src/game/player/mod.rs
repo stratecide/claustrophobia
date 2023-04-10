@@ -18,8 +18,13 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app
             .configure_set(InputSystemSet.before(PhysicsSystemSet::SetMovementThisFrame))
-            .add_system(spawn_player.in_schedule(OnEnter(Screen::Level)))
+            .add_systems((
+                    spawn_player,
+                    spawn_couch,
+            ).in_schedule(OnEnter(Screen::Level)))
             .add_system(player_input.before(PhysicsSystemSet::SetMovementThisFrame))
+            .add_system(rest_on_couch)
+            .add_system(reset_level)
             ;
     }
 }

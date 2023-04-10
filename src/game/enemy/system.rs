@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy::utils::HashSet;
+use crate::game::component::GameElement;
 use crate::game::medicine::resource::SideEffects;
 use crate::game::physics::component::*;
 use crate::game::player::component::Player;
@@ -20,6 +21,7 @@ pub fn spawn_enemy(
 
     for enemy_pos in &level_data.patrol_spawners {
         commands.spawn((
+            GameElement,
             PatrolSpawner(None),
             SpriteBundle {
                 texture: asset_server.load("enemy/patrol_spawner.png"),
@@ -31,6 +33,7 @@ pub fn spawn_enemy(
     for enemy_pos in &level_data.patrol_despawners {
         println!("added despawner");
         commands.spawn((
+            GameElement,
             PatrolDespawner,
             SpriteBundle {
                 texture: asset_server.load("enemy/patrol_despawner.png"),
@@ -41,6 +44,7 @@ pub fn spawn_enemy(
     }
     for enemy_pos in &level_data.patrols {
         commands.spawn((
+            GameElement,
             Patrol(false),
             GravityBody,
             Movement {
@@ -102,7 +106,7 @@ pub fn control_enemy(
         }
         if !side_effects.is_active() && !side_effects.sedated && !movement.grounded && patrol.0 {
             // went over an edge, jump
-            movement.speed.y = 300.;
+            movement.speed.y = 350.;
         }
         patrol.0 = movement.grounded;
     }
@@ -141,6 +145,7 @@ pub fn spawn_patrol(
     for (mut spawner, transform) in spawner_query.iter_mut() {
         if spawner.0.and_then(|e| Some(!existing_patrols.contains(&e))).unwrap_or(true) {
             let mut cmd = commands.spawn((
+                GameElement,
                 Patrol(false),
                 GravityBody,
                 Movement {
